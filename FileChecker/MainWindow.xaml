@@ -1,0 +1,51 @@
+﻿<Window x:Class="FileChecker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FileChecker"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <local:FileInformationVisibilityConverter x:Key="fileInformationVisibilityConverter" />
+    </Window.Resources>
+    <Window.DataContext>
+        <local:ApplicationViewModel />
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height=".2*" />
+            <RowDefinition />
+            <RowDefinition Height=".1*" />
+            <RowDefinition Height=".1*" />
+        </Grid.RowDefinitions>
+        <Button
+            Grid.Row="0"
+            Command="{Binding ExploreDirectory}"
+            >Rechercher un dossier</Button>
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding MissingLines}" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Nom du fichier manquant" Binding="{Binding FullName}"  />
+                <DataGridTextColumn Header="Annéee" Binding="{Binding Year}"  />
+                <DataGridTextColumn Header="Type" Binding="{Binding Type}"  />
+                <DataGridTextColumn Header="Identifiant" Binding="{Binding Id}"  />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <ProgressBar Grid.Row="2" Value="{Binding AnalyseProgress, Mode=OneWay}" Minimum="0" Maximum="100" />
+
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" VerticalAlignment="Center">
+                <Run Text="{Binding MissingLines.Count, Mode=OneWay }" /> fichiers manquants sur <Run Text="{Binding FileCount}" /> fichiers analysés.
+            </TextBlock>
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 32 0" Visibility="{Binding CurrentFile, Converter={StaticResource fileInformationVisibilityConverter}}">
+                L'année <Run Text="{Binding CurrentFile.Year, Mode=OneWay}" /> est en cours d'analyse...
+            </TextBlock>
+        </Grid>
+    </Grid>
+</Window>
