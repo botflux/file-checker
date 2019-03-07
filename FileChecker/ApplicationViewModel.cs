@@ -17,6 +17,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Windows.Threading;
 using Application = System.Windows.Application;
+using System.Drawing.Printing;
+using System.Drawing;
 
 namespace FileChecker
 {
@@ -40,6 +42,8 @@ namespace FileChecker
 
         private FileInformation currentFile;
 
+        private MainWindow currentWindow;
+
         /// <summary>
         /// Represents the missing files inside the selected folder.
         /// </summary>
@@ -49,6 +53,7 @@ namespace FileChecker
         /// Represents the number of fle contains inside the selected folder.
         /// </summary>
         private int fileCount = 0;
+        
         #endregion
 
         #region Computed Properties
@@ -85,6 +90,19 @@ namespace FileChecker
             }
         }
 
+        public MainWindow CurrentWindow
+        {
+            get => currentWindow;
+            set
+            {
+                if (currentWindow != value)
+                {
+                    currentWindow = value;
+                    NotifyProperty();
+                }
+            }
+        }
+
         /// <summary>
         /// The folder path selected by the user
         /// </summary>
@@ -98,7 +116,7 @@ namespace FileChecker
                 NotifyProperty();
             }
         }
-
+        
         public FileInformation CurrentFile
         {
             get => currentFile;
@@ -173,6 +191,82 @@ namespace FileChecker
         /// Explore a given directory
         /// </summary>
         private ICommand exploreDirectory;
+
+        public ICommand CloseApplication
+        {
+            get
+            {
+                if (closeApplication == null)
+                {
+                    closeApplication = new RelayCommand<object>((o) =>
+                    {
+                        Application.Current.Shutdown();
+                    });
+                }
+
+                return closeApplication;
+            }
+        }
+
+        private ICommand closeApplication;
+
+        public ICommand MinimizeApplication
+        {
+            get
+            {
+                if (minimizeApplication == null)
+                {
+                    minimizeApplication = new RelayCommand<object>((o) =>
+                    {
+                        Application.Current.MainWindow.WindowState = WindowState.Minimized;
+                    });
+                }
+
+                return minimizeApplication;
+            }
+        }
+
+        private ICommand minimizeApplication;
+
+        public ICommand MaximizeApplication
+        {
+            get
+            {
+                if (maximizeApplication == null)
+                {
+                    maximizeApplication = new RelayCommand<object>((o) =>
+                    {
+                        Application.Current.MainWindow.WindowState = WindowState.Maximized;
+                    });
+                }
+
+                return maximizeApplication;
+            }
+        }
+
+        private ICommand maximizeApplication;
+
+        public ICommand PrintMissingLines
+        {
+            get
+            {
+                if (printMissingLines == null)
+                {
+                    printMissingLines = new RelayCommand<object>((o) => 
+                    {
+                        PrintDialog printDialog = new PrintDialog();
+
+                        if (printDialog.ShowDialog() == DialogResult.OK)
+                        {
+                        }
+                    });
+                }
+
+                return printMissingLines;
+            }
+        }
+
+        private ICommand printMissingLines;
         #endregion
 
         #region Constructors
@@ -258,7 +352,14 @@ namespace FileChecker
             {
                 if (AnalyseProgress >= 100)
                 {
-                    MessageBox.Show("Le dossier a été analysé !");
+                    CurrentFile = null;
+
+                    this.CurrentWindow.snackbar.MessageQueue.Enqueue(
+                        this.FileCount + " fichiers ont été analysés",
+                        "OK",
+                        param => Trace.WriteLine("Actioned: " + param),
+                        this.FileCount + " fichiers ont été analysés"
+                    );
                 }
             }
         }

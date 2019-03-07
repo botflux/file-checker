@@ -4,23 +4,19 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Data;
 
 namespace FileChecker
 {
-    class FileInformationVisibilityConverter : IValueConverter
+    class CombiningConverter : IValueConverter
     {
+        public IValueConverter Converter1 { get; set; }
+        public IValueConverter Converter2 { get; set; }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null)
-            {
-                return Visibility.Hidden;
-            }
-            else
-            {
-                return Visibility.Visible;
-            }
+            object convertedValue = Converter1.Convert(value, targetType, parameter, culture);
+            return Converter2.Convert(convertedValue, targetType, parameter, culture);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

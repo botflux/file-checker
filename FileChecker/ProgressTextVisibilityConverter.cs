@@ -9,11 +9,11 @@ using System.Windows.Data;
 
 namespace FileChecker
 {
-    class FileInformationVisibilityConverter : IValueConverter
+    class ProgressTextVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null)
+            if (((ApplicationViewModel)value).AnalyseProgress >= 100 || ((ApplicationViewModel)value).CurrentFile == null)
             {
                 return Visibility.Hidden;
             }

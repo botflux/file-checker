@@ -4,48 +4,80 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileChecker"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:smtx="clr-namespace:ShowMeTheXAML;assembly=ShowMeTheXAML"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Title="Vérificateur de fichiers"
+        
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Height="450" Width="800">
     <Window.Resources>
         <local:FileInformationVisibilityConverter x:Key="fileInformationVisibilityConverter" />
+        <local:PercentageVisibilityConverter x:Key="percentageVisibilityConverter" />
     </Window.Resources>
     <Window.DataContext>
         <local:ApplicationViewModel />
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height=".2*" />
-            <RowDefinition />
-            <RowDefinition Height=".1*" />
+            <RowDefinition Height=".9*" />
             <RowDefinition Height=".1*" />
         </Grid.RowDefinitions>
-        <Button
-            Grid.Row="0"
-            Command="{Binding ExploreDirectory}"
-            >Rechercher un dossier</Button>
+        <Grid Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0" />
+                <RowDefinition Height=".2*" />
+                <RowDefinition />
+                <RowDefinition Height=".1*" />
+                <RowDefinition Height=".2*" />
+            </Grid.RowDefinitions>
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding MissingLines}" AutoGenerateColumns="False">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Nom du fichier manquant" Binding="{Binding FullName}"  />
-                <DataGridTextColumn Header="Annéee" Binding="{Binding Year}"  />
-                <DataGridTextColumn Header="Type" Binding="{Binding Type}"  />
-                <DataGridTextColumn Header="Identifiant" Binding="{Binding Id}"  />
-            </DataGrid.Columns>
-        </DataGrid>
+            <Grid Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Button Command="{Binding ExploreDirectory}">
+                    Rechercher un dossier
+                </Button>
 
-        <ProgressBar Grid.Row="2" Value="{Binding AnalyseProgress, Mode=OneWay}" Minimum="0" Maximum="100" />
+                <Button Background="{x:Null}" BorderBrush="{x:Null}" Grid.Column="1" Visibility="{Binding AnalyseProgress, Converter={StaticResource percentageVisibilityConverter}}" Command="{Binding PrintMissingLines}">
+                    <materialDesign:PackIcon Kind="Printer" Foreground="Black" />
+                </Button>
+            </Grid>
+            
+            <DataGrid Grid.Row="2" ItemsSource="{Binding MissingLines}" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Nom du fichier manquant" Binding="{Binding FullName}"  />
+                    <DataGridTextColumn Header="Annéee" Binding="{Binding Year}"  />
+                    <DataGridTextColumn Header="Type" Binding="{Binding Type}"  />
+                    <DataGridTextColumn Header="Identifiant" Binding="{Binding Id}"  />
+                </DataGrid.Columns>
+            </DataGrid>
 
-        <Grid Grid.Row="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" VerticalAlignment="Center">
+            <ProgressBar Grid.Row="3" Value="{Binding AnalyseProgress, Mode=OneWay}" Minimum="0" Maximum="100" />
+
+            <Grid Grid.Row="4" Margin="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" VerticalAlignment="Center">
                 <Run Text="{Binding MissingLines.Count, Mode=OneWay }" /> fichiers manquants sur <Run Text="{Binding FileCount}" /> fichiers analysés.
-            </TextBlock>
-            <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 32 0" Visibility="{Binding CurrentFile, Converter={StaticResource fileInformationVisibilityConverter}}">
+                </TextBlock>
+                <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 32 0" Visibility="{Binding CurrentFile, Converter={StaticResource fileInformationVisibilityConverter}}">
                 L'année <Run Text="{Binding CurrentFile.Year, Mode=OneWay}" /> est en cours d'analyse...
-            </TextBlock>
+                </TextBlock>
+            </Grid>
         </Grid>
+        <smtx:XamlDisplay Grid.Row="1" HorizontalAlignment="Center">
+            <materialDesign:Snackbar x:Name="snackbar" MessageQueue="{materialDesign:MessageQueue}" />
+        </smtx:XamlDisplay>
     </Grid>
+    
 </Window>

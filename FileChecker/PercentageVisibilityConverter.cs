@@ -9,11 +9,11 @@ using System.Windows.Data;
 
 namespace FileChecker
 {
-    class FileInformationVisibilityConverter : IValueConverter
+    class PercentageVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null)
+            if (((float)value) != 100)
             {
                 return Visibility.Hidden;
             }
