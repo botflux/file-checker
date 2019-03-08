@@ -175,6 +175,10 @@ namespace FileChecker
         }
         #endregion
 
+        #region Thread locks
+        private object _locker = new object();
+        #endregion
+
         #region Commands
         /// <summary>
         /// Explore a directory and look for missing files
@@ -286,10 +290,51 @@ namespace FileChecker
                 {
                     printMissingLines = new RelayCommand<object>((o) => 
                     {
-                        PrintDialog printDialog = new PrintDialog();
-
-                        if (printDialog.ShowDialog() == DialogResult.OK)
+                        using (PrintDocument pd = new PrintDocument())
                         {
+                            using (PrintDialog printDialog = new PrintDialog())
+                            {
+                                if (printDialog.ShowDialog() == DialogResult.OK)
+                                {
+                                    Queue<FileInformation> missingLinesQueue = new Queue<FileInformation>(MissingLines);
+
+                                    pd.PrinterSettings = printDialog.PrinterSettings;
+
+                                    pd.PrintPage += (object sender, PrintPageEventArgs ev) =>
+                                    {
+                                        float linesPerPage = 0;
+                                        float yPos = 0;
+                                        int count = 0;
+                                        float leftMargin = ev.MarginBounds.Left;
+                                        float topMargin = ev.MarginBounds.Top;
+                                        Font f = new Font("Arial", 15);
+
+                                        linesPerPage = ev.MarginBounds.Height / f.GetHeight(ev.Graphics);
+
+                                        while (count < linesPerPage && missingLinesQueue.Count != 0)
+                                        {
+                                            FileInformation current = missingLinesQueue.Dequeue();
+                                            yPos = topMargin + (count * f.GetHeight(ev.Graphics));
+                                            ev.Graphics.DrawString(
+                                                current.FullName, f, 
+                                                Brushes.Black, ev.MarginBounds.Left, 
+                                                yPos, new StringFormat()
+                                            );
+
+                                            count++;
+                                        }
+                                        
+                                        if (missingLinesQueue.Count == 0)
+                                        {
+                                            ev.HasMorePages = false;
+                                        } else
+                                        {
+                                            ev.HasMorePages = true;
+                                        }
+                                    };
+                                    pd.Print();
+                                }
+                            }
                         }
                     });
                 }

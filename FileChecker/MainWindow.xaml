@@ -50,7 +50,6 @@
                     <materialDesign:PackIcon Kind="Printer" Foreground="Black" />
                 </Button>
             </Grid>
-            
             <DataGrid Grid.Row="2" ItemsSource="{Binding MissingLines}" AutoGenerateColumns="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Nom du fichier manquant" Binding="{Binding FullName}"  />
