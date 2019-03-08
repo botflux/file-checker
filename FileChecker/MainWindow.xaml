@@ -19,6 +19,7 @@
     <Window.Resources>
         <local:FileInformationVisibilityConverter x:Key="fileInformationVisibilityConverter" />
         <local:PercentageVisibilityConverter x:Key="percentageVisibilityConverter" />
+        <local:ShortPathConverter x:Key="shortPathConverter" />
     </Window.Resources>
     <Window.DataContext>
         <local:ApplicationViewModel />
@@ -34,7 +35,7 @@
                 <RowDefinition Height=".2*" />
                 <RowDefinition />
                 <RowDefinition Height=".1*" />
-                <RowDefinition Height=".2*" />
+                <RowDefinition Height=".25*" />
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -65,12 +66,15 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition />
+                    <!--<ColumnDefinition />-->
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" VerticalAlignment="Center">
-                <Run Text="{Binding MissingLines.Count, Mode=OneWay }" /> fichiers manquants sur <Run Text="{Binding FileCount}" /> fichiers analysés.
+                    <Run Text="{Binding MissingLines.Count, Mode=OneWay }" /> fichiers manquants sur <Run Text="{Binding FileCount}" /> fichiers analysés. <LineBreak />
+                    <Run Text="{Binding SelectedPath, Mode=OneWay,Converter={StaticResource shortPathConverter}}" />
                 </TextBlock>
+                <!--<TextBlock Text="{Binding SelectedPath, Mode=OneWay,Converter={StaticResource shortPathConverter}}"  Grid.Column="1"/>-->
                 <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 32 0" Visibility="{Binding CurrentFile, Converter={StaticResource fileInformationVisibilityConverter}}">
-                L'année <Run Text="{Binding CurrentFile.Year, Mode=OneWay}" /> est en cours d'analyse...
+                    L'année <Run Text="{Binding CurrentFile.Year, Mode=OneWay}" /> est en cours d'analyse...
                 </TextBlock>
             </Grid>
         </Grid>

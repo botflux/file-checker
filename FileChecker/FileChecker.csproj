@@ -73,6 +73,7 @@
     <Compile Include="PercentageVisibilityConverter.cs" />
     <Compile Include="ProgressTextVisibilityConverter.cs" />
     <Compile Include="RelayCommand.cs" />
+    <Compile Include="ShortPathConverter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

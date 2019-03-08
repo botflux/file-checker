@@ -59,9 +59,25 @@ namespace FileChecker
         /// Represents the number of fle contains inside the selected folder.
         /// </summary>
         private int fileCount = 0;
+
+        private int parsedCount = 0;
         #endregion
 
         #region Computed Properties
+        public int ParsedCount
+        {
+            get => parsedCount;
+            set
+            {
+                if (value != parsedCount)
+                {
+                    NotifyProperty();
+                    NotifyProperty("AnalyseProgress");
+                    parsedCount = value;
+                }
+            }
+        }
+
         /// <summary>
         /// Percent of analyse files
         /// </summary>
@@ -69,12 +85,9 @@ namespace FileChecker
         {
             get
             {
-                if (ProcessedFile != 0 && FileCount != 0)
-                {
-                    return ((float)ProcessedFile / (float)FileCount) * 100;
-                }
-
-                return 0;
+                return
+                    ((ParsedCount != 0 && FileCount != 0) ? (((float)ParsedCount / (float)FileCount) * 50) : 0) +
+                    ((ProcessedFile != 0 && FileCount != 0) ? (((float)ProcessedFile / (float)FileCount) * 50) : 0);   
             }
         }
 
@@ -157,7 +170,7 @@ namespace FileChecker
                 }
             }
         }
-
+        
         /// <summary>
         /// Represents all the missings files
         /// </summary>
@@ -365,24 +378,55 @@ namespace FileChecker
         /// </summary>
         private void Explore ()
         {
-            if (!Directory.Exists(this.selectedPath)) MessageBox.Show("Le dossier spécifié n'existe pas !");
+            if (!Directory.Exists(this.selectedPath))
+            {
+                this.CurrentWindow.snackbar.MessageQueue.Enqueue(
+                    "Le dossier spécifié n'existe pas !",
+                    "OK",
+                    () => Trace.WriteLine("Actioned")
+                );
+            }
 
-            string[] files = Directory.GetFiles(this.selectedPath, "*.tif");
-
-
-            FileCount = files.Length;
-            Regex rx = new Regex(@"(?<year>\d{4})(?<type>\w)(?<id>\d{3})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            string[] files = Directory.GetFiles(this.selectedPath, "*.tif", SearchOption.AllDirectories);
 
             Thread th = new Thread(new ThreadStart(() => {
+                
+                Regex rx = new Regex(@"(?<year>\d{4})(?<type>\w)(?<id>\d{3})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-                FileInformation previousFile = FileInformation.GetFileInformation(
-                    files.First()
-                );
+                // exclude filename that doesn't match the regex
+                files = files.Where(s => rx.Match(s).Success).ToArray();
 
-                foreach (string file in files)
+                // Set the file count
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    FileInformation currentFile = FileInformation.GetFileInformation(file);
+                    FileCount = files.Length;
+                });
 
+                // Transform each filename into a file information object
+                List<FileInformation> filesInformations = files.Select(file => 
+                {
+                    Application.Current.Dispatcher.Invoke(() => 
+                    {
+                        Console.WriteLine("ParsedCount" + ParsedCount);
+                        ParsedCount++;
+                    });
+                    return FileInformation.GetFileInformation(file);
+                }).ToList();
+
+                // sort all file information objects
+                filesInformations.Sort(delegate (FileInformation x, FileInformation y) {
+                    if (x == null && y == null) return 0;
+                    else if (x == null) return 1;
+                    else if (y == null) return -1;
+
+                    if (x.Year.CompareTo(y.Year) == 0) return x.Id.CompareTo(y.Id);
+                    else return x.Year.CompareTo(y.Year);
+                });
+
+                FileInformation previousFile = filesInformations.First();
+
+                foreach (FileInformation currentFile in filesInformations)
+                {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         this.CurrentFile = currentFile;
