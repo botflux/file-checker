@@ -192,6 +192,9 @@ namespace FileChecker
         /// </summary>
         private ICommand exploreDirectory;
 
+        /// <summary>
+        /// Close the application
+        /// </summary>
         public ICommand CloseApplication
         {
             get
@@ -208,8 +211,14 @@ namespace FileChecker
             }
         }
 
+        /// <summary>
+        /// Close the application
+        /// </summary>
         private ICommand closeApplication;
 
+        /// <summary>
+        /// Minimize the application
+        /// </summary>
         public ICommand MinimizeApplication
         {
             get
@@ -226,8 +235,14 @@ namespace FileChecker
             }
         }
 
+        /// <summary>
+        /// Minimize the application
+        /// </summary>
         private ICommand minimizeApplication;
 
+        /// <summary>
+        /// Maximize the application
+        /// </summary>
         public ICommand MaximizeApplication
         {
             get
@@ -244,8 +259,14 @@ namespace FileChecker
             }
         }
 
+        /// <summary>
+        /// Maximize the application
+        /// </summary>
         private ICommand maximizeApplication;
 
+        /// <summary>
+        /// Print found missing lines
+        /// </summary>
         public ICommand PrintMissingLines
         {
             get
@@ -266,10 +287,16 @@ namespace FileChecker
             }
         }
 
+        /// <summary>
+        /// Print found missing lines
+        /// </summary>
         private ICommand printMissingLines;
         #endregion
 
         #region Constructors
+        /// <summary>
+        /// Initialize a new instance of ApplicationViewModel
+        /// </summary>
         public ApplicationViewModel ()
         {
             this.PropertyChanged += OnPropertyChanged;
@@ -277,6 +304,9 @@ namespace FileChecker
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Explore the selected path folder
+        /// </summary>
         private void Explore ()
         {
             if (!Directory.Exists(this.selectedPath)) MessageBox.Show("Le dossier spécifié n'existe pas !");
