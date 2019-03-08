@@ -40,8 +40,14 @@ namespace FileChecker
         /// </summary>
         private int processedFile = 0;
 
+        /// <summary>
+        /// Current file that is check
+        /// </summary>
         private FileInformation currentFile;
 
+        /// <summary>
+        /// View
+        /// </summary>
         private MainWindow currentWindow;
 
         /// <summary>
@@ -53,7 +59,6 @@ namespace FileChecker
         /// Represents the number of fle contains inside the selected folder.
         /// </summary>
         private int fileCount = 0;
-        
         #endregion
 
         #region Computed Properties
@@ -90,6 +95,9 @@ namespace FileChecker
             }
         }
 
+        /// <summary>
+        /// View
+        /// </summary>
         public MainWindow CurrentWindow
         {
             get => currentWindow;
@@ -117,6 +125,9 @@ namespace FileChecker
             }
         }
         
+        /// <summary>
+        /// Current file that is check
+        /// </summary>
         public FileInformation CurrentFile
         {
             get => currentFile;
